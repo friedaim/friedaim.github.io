@@ -94,4 +94,6 @@ I recommend renaming `alpine_blah_blah.tar.gz` to something easy like `alpine.ta
 **Now we can celebrate!**
 
 ## Covering Tracks
-Finally, before we call any pentest done, we need to erase any evidence that we were on the system. There's many levels of depth this can go but for this instance we'll just leave it at deleting any files we created on the target machine. So go back to the `/var/tmp/` directory and delete the entire lxd directory. Some other measures we can take to cover our tracks include: deleting our lxd containers and images, deleting our presense from log files, and others. If you want to learn more about covering your tracks after pentests, read [this article](https://github.com/lamontns/pentest/blob/master/post-exploitation/covering-your-tracks.md). 
+Finally, before we call any pentest done, we need to erase any evidence that we were on the system. There's many levels of depth this can go but for this instance we'll just leave it at deleting any files we created on the target machine. So go back to the `/var/tmp/` directory and delete the entire lxd directory. Some other measures we can take to cover our tracks include: deleting our lxd containers and images, deleting our presense from log files, and others. If you want to learn more about covering your tracks after pentests, read [this article](https://github.com/lamontns/pentest/blob/master/post-exploitation/covering-your-tracks.md).  
+
+If you enjoyed this walkthrough on Gaming Server from TryHackMe, follow me on [Twitter](https://twitter.com/RobbieBePoppin).
