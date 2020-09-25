@@ -2,7 +2,7 @@
 layout: post
 title: "Try Hack Me: Gaming Server Walk Through"
 ---
-![]({{site.baseurl }}/images/gamingServer/Title.png)
+![]({{ site.baseurl }}/images/gamingServer/Title.png)
 
 ### Pre-Requisites
 + Beginner-Intermediate understanding of Linux Operating Systems and file structure.
@@ -21,11 +21,11 @@ So, after (hopefully) reading up on the Nmap and/or Rustscan material we will ha
 
 After scanning the machine with the Rustscan command below,
 
-![]({{site.baseurl}}/images/gamingServer/rustscan.png)
+![]({{ site.baseurl }}/images/gamingServer/rustscan.png)
 
 we see that `port 22` and `port 80` are open. Meaning we have `SSH` and a `Webserver` running. Before looking further into the webserver, we should multitask by starting another scan first. It is also good practice to perform a `-A` Nmap scan on the ports we found open so we can find version info, OS info, and do general vulnerability scans off the bat. Luckily, Rustscan also has built-in functionality for running Nmap commands after its scan.
 
-![]({{site.baseurl}}/images/gamingServer/rustscan-a-command.png)
+![]({{ site.baseurl }}/images/gamingServer/rustscan-a-command.png)
 
 ## Enumeration
 Now, with that running we can take a look at the website that is running on port 80. First impressions, it looks like a template website, or at least a website in the making. It's always good practice to look through the `source code` of websites to see if you can find any clues about where to look for insecurities. Taking a look at the source code of the home page we see that (at the very top) this website was indeed made with a template (**potential vulnerability to research later**. Additionally, at the bottom of the source code we see the comment `<!-- john, please add some actual content to the site! lorem ipsum is horrible to look at. -->` indicating that there might be a potential user `john` available on the remote machine through `SSH` (**another potential vulnerability to research later**).
@@ -33,19 +33,19 @@ Now, with that running we can take a look at the website that is running on port
 
 If we use the `-A` flag after specifying we want to input an Nmap command into Rustscan, we get this:
 
-![]({{site.bareurl}}/images/gamingServer/rustscan-a.png)
+![]({{ site.bareurl }}/images/gamingServer/rustscan-a.png)
 
 which has much more information to it, but the bulk of what we want to know for not is here. We get the version info of both the SSH and the webserver, take note of these by saving all the Rustscan output in a file.
 
 Next, let's take a look at the other pages on the website. It seems like there's only 3 different pages on the website. Viewing the sources and general look of all the pages yields nothing out of the ordinary or suspicious. However, after more exploration on the home page and clicking different links, we see that the `Read More` button takes us to a 404 page.
 
-![]({{site.baseurl}}/images/gamingServer/404-page.png)
+![]({{ site.baseurl }}/images/gamingServer/404-page.png)
 
 Take note of this, because it's an information disclosure, showing the webserver service running and the version number. With this we could **potentially find vulnerabilities with the version number**. On the subject of links from the home page, **try to find another link on the dragon lore page leading to some information disclosures**.
 
 Hopefully, you've explored the home page some more to discover a small link that links to some pretty sensitive information. The upload button leads to a pretty sensitive page with some interesting content.
 
-![]({{site.baseurl}}/image/gamingServer/uploads-home.png)
+![]({{ site.baseurl }}/image/gamingServer/uploads-home.png)
 
 Whenever you find information like this, download all the files in the directory immediately. Upon further inspection, it looks like we have a potential wordlist for passwords, a hacker manifesto, and a meme.
 
@@ -53,7 +53,7 @@ Maybe after a few more minutes of looking around, you'll start to feel stuck. Th
 
 While the scan is running, lets take a look at the wordlist we found from the /uploads directory. It's exactly as I expect, a password list. So, this means we should probably use it on something (**possibly to brute force our way into the SSH user john?**). However, after about 2 minutes of running Gobuster, it finds a secret directory called `/secret`. Going to that directory on the browser reveals something interesting...
 
-![]({{site.baseurl}}/images/gamingServer/secret.png)
+![]({{ site.baseurl }}/images/gamingServer/secret.png)
 
 After downloading the file, we see that it looks like an SSH key. However, when we try to `SSH` into `john` at the target's IP using the key we found in the directory as an identity file, it prompts us for a passphrase. So I looked into this more, **literally googling "how to crack ssh key passphrase"**, I came across [this article](https://bytesoverbombs.io/cracking-everything-with-john-the-ripper-d434f0f6dc1c). This article really helped me out in finding out the next steps, so read through it and come back to this. In the article, it basically introduces the [SSH2John](https://github.com/openwall/john/blob/bleeding-jumbo/run/ssh2john.py) utility, which we need to use to convert the ssh key to a crackable john file. Then with this we can crack the password to the file by using the password list we found on `/uploads`.
 
@@ -62,7 +62,7 @@ After downloading the file, we see that it looks like an SSH key. However, when 
 
 Okay, so let's convert the ssh key we found into a [JohnTheRipper](https://github.com/openwall/john) readable file and be sure to put the output into a new file `ssh2john.py ssh.key > sshjohn.txt`. Now, we need to use JohnTheRipper to crack the key using the word list `dict.lst` from the `/uploads` directory. I wasn't sure how to do this, so I just tried it and john spit back an error saying `Use the "--format=SSH" option to force loading hashes of that type instead`, which I added and it then cracked a password.
 
-![]({{site.baseurl}}/images/gamingServer/sshkeycracked.png)
+![]({{ site.baseurl }}/images/gamingServer/sshkeycracked.png)
 
 Alright, now we have the password to login to the `SSH` user `john` at the targets IP address. **Let's Login** with the ssh key we found on `/secret` and the password we just cracked from the key. **Aaaaand we're in!**
 Now let's peak around a bit, we find the `user.txt` in the home directory. Take a look around and try to find anything interesting.  
@@ -80,7 +80,7 @@ I later went back to my original google search of `LXD exploit` and found [anoth
 
 Alright, you should have something like this:
 
-![]({{site.baseurl}}/images/gamingServer/alpine-ls.png)
+![]({{ site.baseurl }}/images/gamingServer/alpine-ls.png)
 
 I recommend renaming `alpine_blah_blah.tar.gz` to something easy like `alpine.tar.gz`. Now we need to actually transfer the alpine image to the target machine, but since it doesn't have internet we need to host a server ourselves and wget or curl the alpine image onto the target machine from the target machine. Here's the steps:  
 
@@ -89,7 +89,7 @@ I recommend renaming `alpine_blah_blah.tar.gz` to something easy like `alpine.ta
 
 **Switch back to the target machine** where we're logged in as `john@exploitable` and navigate to a place in the file system where you can create directories, I chose `/var/tmp/` for this. Now lets curl a copy of the alpine image into the directory (*I also created a directory for lxd for easy removal later*). Now that it's on the target machine, lets keep following the tutorial. The next step would be to import the image with `lxc image import ./alpine.tar.gz --alias *image name here*`, then create a container with `lxc init myimage mycontainer -c security.privileged=true`. Just keep following the tutorial on the article from here. So from here we mount the **/mnt/root** folder onto the container and start the container. Now we need to execute `/bin/sh` from the container using lxc, then naturally I would navigate to the `/root` folder to try to find the `root.txt` However, we **mounted** the root folder to a different location, if you can recall from earlier. After navigating to that location we see a `/root` folder where, after navigating into that directory, we see the **root.txt** file.
 
-![]({{site.baseurl}}/images/gamingServer/root.png)
+![]({{ site.baseurl}}/images/gamingServer/root.png)
 
 **Now we can celebrate!**
 
