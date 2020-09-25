@@ -2,7 +2,7 @@
 layout: post
 title: "Try Hack Me: Gaming Server Walk Through"
 ---
-![]({{ site.baseurl }}/images/gamingServer/Title.png)
+![](/images/gamingServer/Title.png)
 
 ### Pre-Requisites
 + Beginner-Intermediate understanding of Linux Operating Systems and file structure.
